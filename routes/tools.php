@@ -3,6 +3,7 @@ use App\Http\Controllers\AiToolsController;
 use App\Http\Controllers\TextToolsController;
 use App\Http\Controllers\UtilToolsController;
 use App\Http\Controllers\ImageToolsController;
+use App\Http\Controllers\InternetToolsController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -30,6 +31,8 @@ Route::group(['prefix' => 'utility'] , function(){
     Route::get('/tasbih-digital' , [UtilToolsController::class , 'tasbihDigital'])->name('utility.tasbih-digital');
     Route::get('/papan-skor' , [UtilToolsController::class , 'papanSkor'])->name('utility.papan-skor');
     Route::get('/kocok-dadu', [UtilToolsController::class ,'kocokDadu'])->name('utility.kocok-dadu');
+    Route::get('/invoice-maker', [UtilToolsController::class ,'invoiceMaker'])->name('utility.invoice-maker');
+    Route::post('/invoice-maker/download', [UtilToolsController::class ,'invoiceMakerDownload'])->name('utility.invoice-maker.download');
 });
 
 Route::group(['prefix' => 'image'] , function(){
@@ -39,4 +42,13 @@ Route::group(['prefix' => 'image'] , function(){
     Route::post('/jpg-to-webp/process', [ImageToolsController::class, 'processJpgToWebp'])->name('image.jpg-to-webp.process');
     Route::post('/png-to-webp/process', [ImageToolsController::class, 'processPngToWebp'])->name('image.png-to-webp.process');
     Route::get('/png-to-webp/download-zip/{id}', [ImageToolsController::class, 'downloadZip'])->name('image.png-to-webp.download-zip');
+    Route::get('/watermark-image',[ImageToolsController::class,'watermarkImage'])->name('image.watermark-image');
+});
+
+Route::group(['prefix' => 'internet'] , function()
+{
+    Route::get('smtp-tester' , [InternetToolsController::class , 'smtpTester'])->name('internet.smtp-tester');
+    Route::post('smtp-tester/test' , [InternetToolsController::class , 'testSmtp'])->name('internet.smtp-tester.test');
+    Route::get('ip-geolocation' , [InternetToolsController::class , 'ipGeolocation'])->name('internet.ip-geolocation');
+    Route::get('read-email-inbox' , [InternetToolsController::class , 'readEmailInbox'])->name('internet.read-email-inbox');
 });

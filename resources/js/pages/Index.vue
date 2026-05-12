@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ref, computed } from 'vue';
 import HomeLayout from '@/layouts/HomeLayout.vue';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -20,7 +21,11 @@ import {
     MousePointer2,
     TimerIcon,
     Presentation,
-    Dices
+    Dices,
+    Globe2,
+    Mail,
+    GlobeLock,
+    MailOpen
 } from 'lucide-vue-next';
 
 interface Tool {
@@ -66,15 +71,41 @@ const imageTools: Tool[] = [
 const UtilityTools: Tool[] = [
     {name: 'Tasbih Digital' , description: 'Digital Tasbih for counting Zikr and Dhikr.' , icon: TimerIcon , href: '/utility/tasbih-digital'},
     {name:'Papan Skor' , description: 'Papan Skor untuk menghitung skor pertandingan.' , icon: Presentation , href: '/utility/papan-skor'},
-    {name:'Kocok Dadu' , description: 'Kocok dadu untuk menentukan pilihan secara acak.' , icon: Dices , href: '/utility/kocok-dadu'}
+    {name:'Kocok Dadu' , description: 'Kocok dadu untuk menentukan pilihan secara acak.' , icon: Dices , href: '/utility/kocok-dadu'},
+    {name:'Invoice Maker' , description: 'JavaraDigital Invoice Maker' , icon: StickyNote , href: '/utility/invoice-maker'}
+]
+const InternetTools: Tool[] = [
+    {name: 'SMTP Tester',description: 'Test SMTP server connection.' , icon: Mail , href: '/internet/smtp-tester'},
+    {name: 'IP Geolocation' , description: 'Get IP address geolocation.' , icon: GlobeLock , href: '/internet/ip-geolocation'},
+    {name: 'Read Email Inbox' , description: 'Read email inbox with imap' , icon: MailOpen , href: '/internet/read-email-inbox'}
 ]
 
 const categories = [
     { name: 'AI Tools', tools: aiTools, icon: Sparkles, color: 'text-purple-400' },
     { name: 'Text Tools', tools: textTools, icon: Type, color: 'text-blue-400' },
     { name: 'Image Tools', tools: imageTools, icon: ImageIcon, color: 'text-emerald-400' },
-    {name: 'Utilities' , tools: UtilityTools , icon: MousePointer2 , color: 'text-red-400'}
+    {name: 'Utilities' , tools: UtilityTools , icon: MousePointer2 , color: 'text-red-400'},
+    {name: 'Internet Tools',tools: InternetTools , icon: Globe2 , color: 'text-green-400'}
 ];
+
+const searchQuery = ref('');
+
+const filteredCategories = computed(() => {
+    if (!searchQuery.value) return categories;
+    
+    const query = searchQuery.value.toLowerCase();
+    
+    return categories.map(category => {
+        const filteredTools = category.tools.filter(tool => 
+            tool.name.toLowerCase().includes(query) || 
+            tool.description.toLowerCase().includes(query)
+        );
+        return {
+            ...category,
+            tools: filteredTools
+        };
+    }).filter(category => category.tools.length > 0);
+});
 </script>
 
 <template>
@@ -108,6 +139,7 @@ const categories = [
                     <div class="relative w-full max-w-md group">
                         <Search class="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-zinc-500 transition-colors group-focus-within:text-indigo-400" />
                         <Input 
+                            v-model="searchQuery"
                             placeholder="Find a tool (e.g., QR Code, Word Counter...)" 
                             class="pl-11 h-12 bg-zinc-900/50 border-zinc-800 text-zinc-100 placeholder:text-zinc-500 focus:ring-indigo-500/30 transition-all rounded-xl"
                         />
@@ -118,8 +150,15 @@ const categories = [
 
         <!-- Tools Grid -->
         <section id="tools" class="py-16 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div class="space-y-24">
-                <div v-for="category in categories" :key="category.name" class="space-y-8">
+            <div v-if="filteredCategories.length === 0" class="text-center py-24">
+                <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-zinc-900 border border-zinc-800 mb-6">
+                    <Search class="h-10 w-10 text-zinc-500" />
+                </div>
+                <h3 class="text-2xl font-bold text-white mb-3">No tools found</h3>
+                <p class="text-zinc-400 max-w-md mx-auto">We couldn't find any tools matching your search query. Try using different keywords.</p>
+            </div>
+            <div v-else class="space-y-24">
+                <div v-for="category in filteredCategories" :key="category.name" class="space-y-8">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center gap-3">
                             <div class="p-2 rounded-lg bg-zinc-900 border border-zinc-800">

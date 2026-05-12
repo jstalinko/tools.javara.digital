@@ -119,5 +119,9 @@ class ImageToolsController extends Controller
 
         return response()->download($zipFile)->deleteFileAfterSend(true);
     }
+    public function watermarkImage(Request $request)
+    {
+        return Inertia::render('tools/image/WatermarkImage');
+    }
     
 }
